@@ -3,10 +3,12 @@ package com.paypal.bfs.test.employeeserv.services.employeecontrollerservice;
 import com.paypal.bfs.test.employeeserv.api.model.Address;
 import com.paypal.bfs.test.employeeserv.api.model.Employee;
 import com.paypal.bfs.test.employeeserv.entities.EmployeeEntity;
+import com.paypal.bfs.test.employeeserv.enums.ValidatorKeys;
 import com.paypal.bfs.test.employeeserv.repositories.EmployeeCustomDao;
 import com.paypal.bfs.test.employeeserv.repositories.EmployeeDao;
 import com.paypal.bfs.test.employeeserv.services.converterservice.ConverterService;
 import com.paypal.bfs.test.employeeserv.services.employeecontrollerservice.impl.EmployeeServiceImpl;
+import com.paypal.bfs.test.employeeserv.services.validator.Validator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,8 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -29,6 +33,9 @@ public class EmployeeServiceImplTest {
 
     @Mock
     private ConverterService converterService;
+
+    @Mock
+    private Validator validator;
 
     @InjectMocks
     private EmployeeServiceImpl employeeService;
@@ -92,7 +99,12 @@ public class EmployeeServiceImplTest {
         boolean isValid = true;
         Employee employee = new Employee();
         employee.setAddress(new Address());
+        Map<String, String> validatorMap = new HashMap<>();
+        validatorMap.put(ValidatorKeys.DATE_OF_BIRTH.name(),null);
+        validatorMap.put(ValidatorKeys.EMAIL.name(),null);
+        validatorMap.put(ValidatorKeys.ZIPCODE.name(),null);
         try {
+            PowerMockito.when(validator.isValidString(validatorMap)).thenReturn(null);
             PowerMockito.when(employeeCustomDao.getEmployeeByEmail(employee)).thenReturn(new EmployeeEntity());
             employeeService.createEmployee(employee);
         } catch (Exception e) {
@@ -107,7 +119,12 @@ public class EmployeeServiceImplTest {
         Employee employee = new Employee();
         employee.setAddress(new Address());
         EmployeeEntity employeeEntity = new EmployeeEntity();
+        Map<String, String> validatorMap = new HashMap<>();
+        validatorMap.put(ValidatorKeys.DATE_OF_BIRTH.name(),null);
+        validatorMap.put(ValidatorKeys.EMAIL.name(),null);
+        validatorMap.put(ValidatorKeys.ZIPCODE.name(),null);
         try {
+            PowerMockito.when(validator.isValidString(validatorMap)).thenReturn(null);
             PowerMockito.when(employeeCustomDao.getEmployeeByEmail(employee)).thenReturn(null);
             PowerMockito.when(converterService.convertEmployeeObjectToEmployeeEntity(employee)).thenReturn(employeeEntity);
             employeeService.createEmployee(employee);
