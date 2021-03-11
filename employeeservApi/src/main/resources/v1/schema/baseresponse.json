@@ -1,0 +1,15 @@
+{
+  "title": "Base Response",
+  "description": "Base Response Object",
+  "type": "object",
+  "properties": {
+    "errorCode": {
+      "description": "errorCode",
+      "type": "integer"
+    },
+    "message": {
+      "description": "message",
+      "type": "String"
+    }
+  }
+}
