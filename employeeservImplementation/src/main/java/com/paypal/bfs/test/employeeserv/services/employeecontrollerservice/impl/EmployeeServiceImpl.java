@@ -2,16 +2,21 @@ package com.paypal.bfs.test.employeeserv.services.employeecontrollerservice.impl
 
 import com.paypal.bfs.test.employeeserv.api.model.Employee;
 import com.paypal.bfs.test.employeeserv.entities.EmployeeEntity;
+import com.paypal.bfs.test.employeeserv.enums.ValidatorKeys;
 import com.paypal.bfs.test.employeeserv.exceptions.BaseException;
 import com.paypal.bfs.test.employeeserv.repositories.EmployeeCustomDao;
 import com.paypal.bfs.test.employeeserv.repositories.EmployeeDao;
 import com.paypal.bfs.test.employeeserv.services.converterservice.ConverterService;
 import com.paypal.bfs.test.employeeserv.services.employeecontrollerservice.EmployeeService;
+import com.paypal.bfs.test.employeeserv.services.validator.Validator;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,6 +35,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private ConverterService converterService;
+
+    @Autowired
+    private Validator validator;
 
     @Override
     public Employee getEmployeeByEmployeeId(Long id) throws Exception {
@@ -72,6 +80,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     private boolean isValidCreateEmployeeRequest(Employee employee) throws BaseException {
         if (Objects.isNull(employee) || Objects.isNull(employee.getAddress())) {
             throw new BaseException(MANDATORY_PARAMS_MISSING, 400);
+        }
+
+        Map<String,String> validatorMap = new HashMap<>();
+        validatorMap.put(ValidatorKeys.DATE_OF_BIRTH.name(),employee.getDateOfBirth());
+        validatorMap.put(ValidatorKeys.EMAIL.name(),employee.getEmail());
+        validatorMap.put(ValidatorKeys.ZIPCODE.name(),employee.getAddress().getZipcode());
+        String validatorResponse = validator.isValidString(validatorMap);
+
+        if(StringUtils.isNotEmpty(validatorResponse)) {
+            throw new BaseException(validatorResponse,400);
         }
 
         Object existingEntity = employeeCustomDao.getEmployeeByEmail(employee);
